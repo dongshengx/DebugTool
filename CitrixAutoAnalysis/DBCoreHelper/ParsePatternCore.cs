@@ -24,23 +24,27 @@ namespace CitrixAutoAnalysis.ParsePatern
 
         public void ParsePattern(Object pattern, bool isIssued = false)
         {
-            Trace.WriteLine("ParsePattern start to tracing...");
-            if(!dbHelper.DBOpen())
+            Console.WriteLine("ParsePattern start to tracing...");
+            if (!dbHelper.IsDBConnected())
             {
-                Trace.TraceError("cannot connect to Database！");
-                return;
+                if (!dbHelper.DBOpen())
+                {
+                    Trace.TraceError("cannot connect to Database！");
+                    return;
+                }
             }
             
             // begin  to parse pattern
             Pattern patternc = (Pattern)pattern;
-            Trace.WriteLine("begin to write pattern into the DB");
+            Console.WriteLine("===============>begin to write pattern into the DB");
             writePatternIntoDB(patternc, patternc.PatternName, isIssued);
             List<Segment> listSeg = patternc.Graph.Segments;
             List<List<Log>> nodeList = new List<List<Log>>();
 
-            Trace.WriteLine("begin to write the segment into DB");
+            Console.WriteLine("begin to write the segment into DB");
             ProcessSegList(listSeg, patternc.Graph.NodeId.ToString());
-            dbHelper.DBClose();
+            Console.WriteLine("==============>Finished writing the Pattern into DB");
+            //dbHelper.DBClose();
 
         }
         private void ProcessSegList(List<Segment> segList, string parentId)
@@ -134,8 +138,8 @@ namespace CitrixAutoAnalysis.ParsePatern
                 new NameAndValues("RelationWithPrevious", null),// need to refine this
                 new NameAndValues("Text", log.Text),
                 new NameAndValues("LineNumInTraceFile",log.LineNumInTrace.ToString()),
-                new NameAndValues("IsForDebug", log.IsForDebug?"1":"0"),
-                new NameAndValues("IsBreakPoint", log.IsForDebug?"1":"0")
+                new NameAndValues("IsForDebug", log.IsForDebug.ToString()),
+                new NameAndValues("IsBreakPoint", log.IsForDebug.ToString())
                );
 
         }
@@ -254,8 +258,8 @@ namespace CitrixAutoAnalysis.ParsePatern
                 node.IndexInSeg = Int32.Parse(dr["IndexInSegment"].ToString());
                 //node.RelationWithPrevious = dr["RelationWithPrevious"];
                 node.LineNumInTrace = Int32.Parse(dr["LineNumInTraceFile"].ToString());
-                node.IsForDebug = (dr["IsForDebug"] as bool?) ?? false;
-                node.IsBreakPoint = (dr["IsBreakPoint"] as bool?) ?? false;
+                //node.IsForDebug = (dr["IsForDebug"] as bool?) ?? false;
+                //node.IsBreakPoint = (dr["IsBreakPoint"] as bool?) ?? false;
                 List<Context> conts = getContextFromDB(node.NodeId.ToString());
                 node.PatternContext = conts;
                 listNodes.Add(node);

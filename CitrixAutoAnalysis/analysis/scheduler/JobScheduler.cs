@@ -15,14 +15,26 @@ namespace CitrixAutoAnalysis.analysis.scheduler
         public static void ScheduleJobs()
         { 
             Job job;
-            while((job = Job.GetTheMostUrgentJob()) != null)
+            while (true)
             {
-                CDFHelper helper = new CDFHelper(job);
+                Console.WriteLine("============>try to get a new Job");
+                try
+                {
+                    while ((job = Job.GetTheMostUrgentJob()) != null)
+                    {
 
-                helper.ProcessJob(job);
+                        CDFHelper helper = new CDFHelper(job);
 
-                // don't let the scheduler eats all CPU 
-                System.Threading.Thread.Sleep(SLEEP_INTERVAL); 
+                        helper.ProcessJob(job);
+
+                        // don't let the scheduler eats all CPU 
+                        System.Threading.Thread.Sleep(SLEEP_INTERVAL);
+                    }
+                }
+                catch (Exception ex)
+                { 
+                    //do nothing
+                }
             }
         }
 
