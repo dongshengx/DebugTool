@@ -339,7 +339,7 @@ namespace DataBaseHelper
                     catch
                     {
                         Console.WriteLine("get IntermediateResult failed" + "\n");
-                        return;
+                        continue;
                     }
                     //try 
                     //{
